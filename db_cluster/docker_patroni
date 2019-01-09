@@ -35,7 +35,7 @@ ADD extras/confd /etc/confd
 RUN sed -i 's/env python/&3/' patroni*.py && ln -s /patronictl.py /usr/local/bin/patronictl && mkdir /data/ /run/haproxy \
     && touch /pgpass /patroni.yml && chown postgres:postgres -R /patroni/ /data/ /pgpass /patroni.yml /etc/haproxy /var/run/ /var/lib/ /var/log/
 
-EXPOSE 2379 5432 8008
+EXPOSE 2379 2380 4001 5432 8008
 
 ENV LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
 ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]

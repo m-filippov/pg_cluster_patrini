@@ -1,18 +1,34 @@
 version: '3'
 services:
-  patroni_etcd:
-    container_name: patroni_etcd
+  etcd1:
+    container_name: etcd1
     image: patroni
-    command: --etcd
-#    networks:
-#      - pg_cluster
-  
-  patroni_etcd1:
-    container_name: patroni_etcd1
+    command: --etcd \
+      --advertise-client-urls=http://etcd1:2379,http://etcd1:4001 \
+      --listen-client-urls=http://0.0.0.0:2379,http://0.0.0.0:4001 \
+      --initial-advertise-peer-urls=http://etcd2:2380 \
+      --listen-peer-urls=http://0.0.0.0:2380 \
+      --initial-cluster-token=9489bf68bdfe1b9ae037d6fd9e7efefd \
+      --initial-cluster=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380 \
+      --initial-cluster-state=new \
+      --auto-tls \
+      --peer-auto-tls \
+      --data-dir=/var/lib/etcd
+
+  etcd2:
+    container_name: etcd2
     image: patroni
-    command: --etcd
-#    networks:
-#      - pg_cluster
+    command: --etcd \
+      --advertise-client-urls=http://etcd2:2379,http://etcd2:4001 \
+      --listen-client-urls=http://0.0.0.0:2379,http://0.0.0.0:4001 \
+      --initial-advertise-peer-urls=http://etcd2:2380 \
+      --listen-peer-urls=http://0.0.0.0:2380 \
+      --initial-cluster-token=9489bf68bdfe1b9ae037d6fd9e7efefd \
+      --initial-cluster=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380 \
+      --initial-cluster-state=new \
+      --auto-tls \
+      --peer-auto-tls \
+      --data-dir=/var/lib/etcd
 
   pg_ressel_node:
     image: patroni
@@ -24,9 +40,13 @@ services:
     env_file: docker/patroni-secrets.env
     environment:
         PATRONI_ETCD_URL: http://patroni_etcd:2379
-        PATRONI_ETCD_URL: http://patroni_etcd1:2379
         PATRONI_NAME: dbnode2
         PATRONI_SCOPE: resell_pg
+
+    deploy:
+        mode: global
+
+
   pg_ressel_node1:
     image: patroni
 #    hostname: dbnode2
@@ -36,14 +56,15 @@ services:
         - ./patroni:/patroni
     env_file: docker/patroni-secrets.env
     environment:
-        PATRONI_ETCD_URL: http://patroni_etcd:2379
-        PATRONI_ETCD_URL: http://patroni_etcd1:2379
+        PATRONI_ETCD_URL: http://patroni_etcd:2379,http://patroni_etcd1:2379
         PATRONI_NAME: dbnode2
         PATRONI_SCOPE: resell_pg
-#    networks:
-#      - pg_cluster
+    deploy:
+        mode: global
 
-  pg_ressel_node:
+
+
+  pg_ressel_node2:
     image: patroni
 #    hostname: dbnode2
     links:
@@ -52,26 +73,22 @@ services:
         - ./patroni:/patroni
     env_file: docker/patroni-secrets.env
     environment:
-        PATRONI_ETCD_URL: http://patroni_etcd:2379
-        PATRONI_ETCD_URL: http://patroni_etcd1:2379
+        PATRONI_ETCD_URL: http://patroni_etcd:2379,http://patroni_etcd1:2379
         PATRONI_NAME: dbnode2
         PATRONI_SCOPE: resell_pg
+    deploy:
+        mode: global
 
   haproxy:
     image: patroni
     links:
         - patroni_etcd:patroni_etcd
-        - patroni_etcd:patroni_etcd1
     ports:
         - "5000:5000"
         - "5001:5001"
     environment:
-        PATRONI_ETCD_URL: http://patroni_etcd1:2379
-        PATRONI_ETCD_URL: http://patroni_etcd:2379
+        PATRONI_ETCD_URL: http://patroni_etcd:2379,http://patroni_etcd1:2379
         PATRONI_SCOPE: resell_pg
     command: --confd
-#    networks:
-#      - pg_cluster
-#networks:
-#  pg_cluster:
-#     external: true
+    deploy:
+        mode: global
