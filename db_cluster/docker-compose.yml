@@ -6,15 +6,19 @@ networks:
 
 services:
 
- etcd:
-    image: appcelerator/etcd:latest
+  etcd:
+    image: etcd:latest
     networks:
       - pg
     environment:
       SERVICE_NAME: "etcd"
-      MIN_SEEDS_COUNT: 2
+      MIN_SEEDS_COUNT: 3
     deploy:
-      mode: global
+      mode: replicated
+      replicas: 3
+    networks:
+      - pg
+   
 
   pg_ressel_node:
     image: patroni
@@ -25,7 +29,7 @@ services:
         - ./patroni:/patroni
     env_file: docker/patroni-secrets.env
     environment:
-        PATRONI_ETCD_URL: http://etcd1:2379
+        PATRONI_ETCD_URL: http://etcd:2379
         PATRONI_NAME: dbnode
         PATRONI_SCOPE: resell_pg
 
@@ -43,7 +47,7 @@ services:
         - ./patroni:/patroni
     env_file: docker/patroni-secrets.env
     environment:
-        PATRONI_ETCD_URL: http://etcd1:2379
+        PATRONI_ETCD_URL: http://etcd:2379
         PATRONI_NAME: dbnode1
         PATRONI_SCOPE: resell_pg
     deploy:
@@ -61,7 +65,7 @@ services:
         - ./patroni:/patroni
     env_file: docker/patroni-secrets.env
     environment:
-        PATRONI_ETCD_HOSTS: etcd1:2379,etcd2:2379
+        PATRONI_ETCD_URL: http://etcd:2379
         PATRONI_NAME: dbnode2
         PATRONI_SCOPE: resell_pg
     deploy:
@@ -71,12 +75,12 @@ services:
   haproxy:
     image: patroni
     links:
-        - patroni_etcd:patroni_etcd
+        - etcd:etcd
     ports:
         - "5000:5000"
         - "5001:5001"
     environment:
-#        PATRONI_ETCD_URL: http://etcd1:2379
+        PATRONI_ETCD_URL: http://etcd:2379
 #        PATRONI_ETCD_URL1: http://etcd1:2379
         PATRONI_SCOPE: resell_pg
     command: --confd
