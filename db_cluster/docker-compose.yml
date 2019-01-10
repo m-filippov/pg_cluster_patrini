@@ -1,46 +1,20 @@
 
 version: '3'
+networks:
+  pg:
+    external: true
+
 services:
-   etcd1:
-    image: quay.io/coreos/etcd
-    ports:
-      - 2379
-    command:
-      - /usr/local/bin/etcd
-      - -name
-      - etcd1
-      - --data-dir
-      - /etcd_data
-      - -advertise-client-urls
-      - http://etcd1:2379
-      - -listen-client-urls
-      - http://0.0.0.0:2379
-      - -initial-advertise-peer-urls
-      - http://etcd1:2380
-      - -listen-peer-urls
-      - http://0.0.0.0:2380
-      - -initial-cluster
-      - etcd1=http://etcd1:2380,etcd2=http://etcd2:2380
-  etcd2:
-    image: quay.io/coreos/etcd
-    ports:
-      - 2379
-    command:
-      - /usr/local/bin/etcd
-      - -name
-      - etcd1
-      - --data-dir
-      - /etcd_data
-      - -advertise-client-urls
-      - http://etcd2:2379
-      - -listen-client-urls
-      - http://0.0.0.0:2379
-      - -initial-advertise-peer-urls
-      - http://etcd2:2380
-      - -listen-peer-urls
-      - http://0.0.0.0:2380
-      - -initial-cluster
-      - etcd1=http://etcd1:2380,etcd2=http://etcd2:2380
+
+ etcd:
+    image: appcelerator/etcd:latest
+    networks:
+      - pg
+    environment:
+      SERVICE_NAME: "etcd"
+      MIN_SEEDS_COUNT: 2
+    deploy:
+      mode: global
 
   pg_ressel_node:
     image: patroni
@@ -57,7 +31,8 @@ services:
 
     deploy:
         mode: global
-
+    networks:
+        - pg
 
   pg_ressel_node1:
     image: patroni
@@ -73,7 +48,8 @@ services:
         PATRONI_SCOPE: resell_pg
     deploy:
         mode: global
-
+    networks:
+        - pg
 
 
   pg_ressel_node2:
@@ -90,7 +66,8 @@ services:
         PATRONI_SCOPE: resell_pg
     deploy:
         mode: global
-
+    networks:
+        - pg
   haproxy:
     image: patroni
     links:
@@ -105,3 +82,5 @@ services:
     command: --confd
     deploy:
         mode: global
+    networks:
+        - pg
