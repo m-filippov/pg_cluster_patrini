@@ -28,7 +28,8 @@ ETCD_ARGS="--data-dir /tmp/etcd.data \
             --listen-client-urls=http://0.0.0.0:2379 \
             --initial-advertise-peer-urls=http://${DOCKER_IP}:2380 \
             --listen-peer-urls=http://0.0.0.0:2380 \
-            --initial-cluster=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380"
+            --initial-cluster=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380 \
+            --initial-cluster-state=new "
 
 optspec=":vh-:"
 while getopts "$optspec" optchar; do
