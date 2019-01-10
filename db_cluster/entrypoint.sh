@@ -46,13 +46,13 @@ while getopts "$optspec" optchar; do
                         done
                         exec $CONFD zookeeper -node ${PATRONI_ZOOKEEPER_HOSTS}
                     else
-                       if ping -c 1 etcd1 &> /dev/null
-                       then
-                          PATRONI_ETCD_URL=http://etcd1:2379
-                       else
-                          PATRONI_ETCD_URL=http://etcd2:2379
-                          sleep 1
-                       fi
+#                       if ping -c 1 etcd1 &> /dev/null
+#                       then
+#                          PATRONI_ETCD_URL=http://etcd1:2379
+#                       else
+#                          PATRONI_ETCD_URL=http://etcd2:2379
+#                          sleep 1
+#                      fi
                        while ! curl -s ${PATRONI_ETCD_URL}/v2/members | jq -r '.members[0].clientURLs[0]' | grep -q http; do
                             sleep 1
                        done
