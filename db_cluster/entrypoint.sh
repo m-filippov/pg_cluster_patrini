@@ -110,10 +110,6 @@ export PATRONI_SUPERUSER_PASSWORD="${PATRONI_SUPERUSER_PASSWORD:-postgres}"
 export PATRONI_POSTGRESQL_PGPASS="$HOME/.pgpass"
 
 cat > /patroni.yml <<__EOF__
-etcd :
-   host :
-    - etcd:2379 
-#    - etcd2:2379 
 
 bootstrap:
   dcs:
