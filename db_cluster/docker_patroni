@@ -4,6 +4,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     && echo 'APT::Install-Recommends "0";\nAPT::Install-Suggests "0";' > /etc/apt/apt.conf.d/01norecommend \
     && apt-get update -y \
     && apt-get upgrade -y \
+    && apt-get install iputils-ping -y \
     # postgres:10 is based on debian, which has patroni package. We will install all required dependencies
     && apt-get install -s patroni | sed -n -e '/^Inst patroni /d' -e 's/^Inst \([^ ]\+\) .*$/\1/p' \
             | xargs apt-get install -y curl jq haproxy locales python3-etcd python3-kazoo \

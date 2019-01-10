@@ -70,7 +70,8 @@ services:
         - "5000:5000"
         - "5001:5001"
     environment:
-        PATRONI_ETCD_URL: http://etcd1:2379
+#        PATRONI_ETCD_URL: http://etcd1:2379
+#        PATRONI_ETCD_URL1: http://etcd1:2379
         PATRONI_SCOPE: resell_pg
     command: --confd
     deploy:
