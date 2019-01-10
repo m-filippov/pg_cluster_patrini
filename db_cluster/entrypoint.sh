@@ -24,7 +24,7 @@ DOCKER_IP=$(hostname --ip-address)
 PATRONI_SCOPE=${PATRONI_SCOPE:-batman}
 ETCD_ARGS="--data-dir /tmp/etcd.data \
             --name ${HOSTNAME} \
-            --advertise-client-urls=http://${DOCKER_IP}:2379,http://${DOCKER_IP}:4001 \ \
+            --advertise-client-urls=http://${DOCKER_IP}:2379,http://${DOCKER_IP}:4001 \
             --listen-client-urls=http://0.0.0.0:2379,http://0.0.0.0:4001 \
             --initial-advertise-peer-urls=http://${DOCKER_IP}:2380 \
             --listen-peer-urls=http://0.0.0.0:2380 \
