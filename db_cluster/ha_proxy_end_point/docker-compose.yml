@@ -1,0 +1,15 @@
+version: '2'
+services:
+
+
+  lb:
+    image: haproxy:latest
+    ports:
+    - '5002'
+    volumes:
+    - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    restart: unless-stopped
+  networks:
+    default:
+      external:
+        name: project_default
